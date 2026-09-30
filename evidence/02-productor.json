@@ -1,0 +1,44 @@
+{
+  "events": 472,
+  "duplicates": 16,
+  "invalid": 4,
+  "disordered": 150,
+  "acknowledged": 472,
+  "failed": 0,
+  "scenario": {
+    "inicio": "2026-09-30T14:56:03.000Z",
+    "duracion_minutos": 20,
+    "semilla": 7,
+    "agentes": 22,
+    "colas": [
+      {
+        "queue_id": "soporte-n1",
+        "agentes": 10,
+        "llegadas_por_hora": 90
+      },
+      {
+        "queue_id": "soporte-n2",
+        "agentes": 7,
+        "llegadas_por_hora": 45
+      },
+      {
+        "queue_id": "ventas",
+        "agentes": 3,
+        "llegadas_por_hora": 30
+      },
+      {
+        "queue_id": "cobranzas",
+        "agentes": 2,
+        "llegadas_por_hora": 24
+      }
+    ]
+  },
+  "generated": {
+    "contact_queued": 70,
+    "contact_connected": 67,
+    "contact_ended": 70,
+    "agent_state_changed": 245,
+    "contactos": 70,
+    "total": 452
+  }
+}

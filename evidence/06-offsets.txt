@@ -1,0 +1,19 @@
+
+GROUP              TOPIC                 PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+cc-beam-metrics-v1 cc.agent-state.raw.v1 0          0               0               0               -               -               -
+cc-beam-metrics-v1 cc.contacts.raw.v1    1          35              35              0               -               -               -
+cc-beam-metrics-v1 cc.contacts.raw.v1    0          38              38              0               -               -               -
+cc-beam-metrics-v1 cc.agent-state.raw.v1 1          60              60              0               -               -               -
+cc-beam-metrics-v1 cc.contacts.raw.v1    3          21              21              0               -               -               -
+cc-beam-metrics-v1 cc.contacts.raw.v1    2          44              44              0               -               -               -
+cc-beam-metrics-v1 cc.agent-state.raw.v1 4          34              34              0               -               -               -
+cc-beam-metrics-v1 cc.contacts.raw.v1    5          51              51              0               -               -               -
+cc-beam-metrics-v1 cc.contacts.raw.v1    4          28              28              0               -               -               -
+cc-beam-metrics-v1 cc.agent-state.raw.v1 5          51              51              0               -               -               -
+cc-beam-metrics-v1 cc.agent-state.raw.v1 2          68              68              0               -               -               -
+cc-beam-metrics-v1 cc.agent-state.raw.v1 3          42              42              0               -               -               -
+
+GROUP                     TOPIC                  PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+cc-dashboard-operacion-v1 cc.queue-metrics.1m.v1 1          43              43              0               -               -               -
+cc-dashboard-operacion-v1 cc.queue-metrics.1m.v1 0          52              52              0               -               -               -
+cc-dashboard-operacion-v1 cc.queue-metrics.1m.v1 2          37              37              0               -               -               -

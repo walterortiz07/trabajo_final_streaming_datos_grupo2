@@ -1,0 +1,5 @@
+
+GROUP                          TOPIC                          PARTITION  NEW-OFFSET     
+cc-dashboard-operacion-v1      cc.queue-metrics.1m.v1         1          0              
+cc-dashboard-operacion-v1      cc.queue-metrics.1m.v1         0          0              
+cc-dashboard-operacion-v1      cc.queue-metrics.1m.v1         2          0              

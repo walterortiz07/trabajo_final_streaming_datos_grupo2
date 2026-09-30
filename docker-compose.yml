@@ -1,0 +1,108 @@
+name: fpuna-proyecto-contact-center
+
+# Contrato de tópicos (ver README):
+#   cc.contacts.raw.v1      6 particiones   clave contact_id   7 días
+#   cc.agent-state.raw.v1   6 particiones   clave agent_id     7 días
+#   cc.queue-metrics.1m.v1  3 particiones   clave queue_id     30 días
+#   cc.events.dlq.v1        1 partición     clave del origen   30 días
+
+x-app-environment: &app-environment
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  KAFKA_CONTACTS_TOPIC: cc.contacts.raw.v1
+  KAFKA_AGENT_STATE_TOPIC: cc.agent-state.raw.v1
+  KAFKA_METRICS_TOPIC: cc.queue-metrics.1m.v1
+  KAFKA_DLQ_TOPIC: cc.events.dlq.v1
+  WINDOW_SECONDS: "60"
+  ALLOWED_LATENESS_SECONDS: "300"
+  EARLY_FIRING_SECONDS: "0"
+  SERVICE_LEVEL_SECONDS: "20"
+  # El harness Java de Beam sondea el servicio de metadatos de EC2 al registrar
+  # S3. Fijar la región evita el sondeo y deja los logs legibles.
+  AWS_REGION: us-east-1
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment: *app-environment
+  volumes:
+    - ./src:/app/src
+    - ./evidence:/app/evidence
+  depends_on:
+    kafka-init:
+      condition: service_completed_successfully
+  restart: "no"
+
+services:
+  kafka:
+    image: apache/kafka:4.1.1
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: CONTROLLER://:9093,PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_NUM_PARTITIONS: 6
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    mem_limit: 1200m
+
+  kafka-init:
+    image: apache/kafka:4.1.1
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-ec"]
+    command:
+      - |
+        crear() {
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 \
+            --create --if-not-exists \
+            --topic "$$1" --partitions "$$2" --replication-factor 1 \
+            --config retention.ms="$$3"
+        }
+        # 7 días = 604800000 ms · 30 días = 2592000000 ms
+        crear cc.contacts.raw.v1      6 604800000
+        crear cc.agent-state.raw.v1   6 604800000
+        crear cc.queue-metrics.1m.v1  3 2592000000
+        crear cc.events.dlq.v1        1 2592000000
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --describe
+
+  # Replay de la jornada simulada. Es el único servicio de aplicación que corre
+  # en Docker: el pipeline y el consumidor no pueden, porque KafkaIO expande
+  # etapas Java y el SDK de Python solo sabe lanzarlas como contenedor, lo que
+  # exige un daemon de Docker que el propio contenedor no tiene. Ver README.
+  producer:
+    <<: *app
+    command:
+      - /app/.venv/bin/python
+      - -m
+      - contact_center.producer
+      - --duration-minutes
+      - "20"
+      - --speedup
+      - "240"
+      - --duplicate-rate
+      - "0.03"
+      - --tardiness-seconds
+      - "45"
+      - --invalid-rate
+      - "0.01"
+
+volumes:
+  kafka-data:

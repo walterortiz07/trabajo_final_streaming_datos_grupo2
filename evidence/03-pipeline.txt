@@ -1,0 +1,8 @@
+WARNING:apache_beam.transforms.core:Key coder FastPrimitivesCoder for transform <ParDo(PTransform) label=[Deduplicar contactos]> with stateful DoFn may not be deterministic. This may cause incorrect behavior for complex key types. Consider adding an input type hint for this transform.
+WARNING:apache_beam.transforms.core:Key coder FastPrimitivesCoder for transform <ParDo(PTransform) label=[Deduplicar transiciones]> with stateful DoFn may not be deterministic. This may cause incorrect behavior for complex key types. Consider adding an input type hint for this transform.
+2.74.0: Pulling from apache/beam_java21_sdk
+Digest: sha256:bedef691b9a2e05a4e43a81fad37f6e3695e22e2faadc7bc0916fb0fd2053bb8
+Status: Image is up to date for apache/beam_java21_sdk:2.74.0
+docker.io/apache/beam_java21_sdk:2.74.0
+86c92695b22b9515bb5f60d6d256d007fb7311cbf7fbb6ebcd105712c43c8a51
+{"estado": "DONE"}

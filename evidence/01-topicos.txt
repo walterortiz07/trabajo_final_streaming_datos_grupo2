@@ -1,0 +1,20 @@
+Topic: cc.contacts.raw.v1	TopicId: CMqZxs7xQiisYQP3VaX8SQ	PartitionCount: 6	ReplicationFactor: 1	Configs: min.insync.replicas=1,retention.ms=604800000
+	Topic: cc.contacts.raw.v1	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.contacts.raw.v1	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.contacts.raw.v1	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.contacts.raw.v1	Partition: 3	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.contacts.raw.v1	Partition: 4	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.contacts.raw.v1	Partition: 5	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+Topic: cc.agent-state.raw.v1	TopicId: B-o82gASQqyKY--WDVjwCQ	PartitionCount: 6	ReplicationFactor: 1	Configs: min.insync.replicas=1,retention.ms=604800000
+	Topic: cc.agent-state.raw.v1	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.agent-state.raw.v1	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.agent-state.raw.v1	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.agent-state.raw.v1	Partition: 3	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.agent-state.raw.v1	Partition: 4	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.agent-state.raw.v1	Partition: 5	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+Topic: cc.events.dlq.v1	TopicId: 3-C2zD5xQZaUitQiF1EOow	PartitionCount: 1	ReplicationFactor: 1	Configs: min.insync.replicas=1,retention.ms=2592000000
+	Topic: cc.events.dlq.v1	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+Topic: cc.queue-metrics.1m.v1	TopicId: FqFNsIw7S8KU2-7X3GoO9A	PartitionCount: 3	ReplicationFactor: 1	Configs: min.insync.replicas=1,retention.ms=2592000000
+	Topic: cc.queue-metrics.1m.v1	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.queue-metrics.1m.v1	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: cc.queue-metrics.1m.v1	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
