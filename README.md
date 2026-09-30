@@ -15,15 +15,23 @@ Repositorio: <https://github.com/walterortiz07/trabajo_final_streaming_datos_gru
 
 ## Qué hace
 
-Un contact center sabe cómo estuvo la operación recién al día siguiente, cuando sale
-el reporte del sistema de telefonía. El problema es que esa información pierde valor
-en minutos: una cola que se satura a las 10:15 se corrige a las 10:20 o ya es una
-llamada abandonada.
+### El problema
 
-Este proyecto construye el recorrido completo —fuente, Kafka, Beam y salida
-consumible— para que el supervisor vea la operación mientras está pasando, con
-métricas por cola y por minuto calculadas sobre el **tiempo en que ocurrieron los
-hechos**, no sobre el momento en que llegaron.
+En un contact center, la operación se conoce **recién al día siguiente**, cuando sale el
+reporte del sistema de telefonía. Ese reporte dice cuántas llamadas entraron, cuánto
+esperaron los clientes y cuántas se abandonaron, pero llega cuando ya no se puede hacer
+nada con esa información.
+
+Y esa información pierde valor en minutos. Si a las 10:15 la cola de soporte empieza a
+crecer, el supervisor necesita verlo a las 10:17 para mover gente de otra cola. A las
+10:40, esos clientes ya cortaron.
+
+### La solución
+
+Un pipeline que calcula esas métricas **mientras la operación está pasando**. Los
+eventos se publican en Kafka, Apache Beam los agrupa por cola y por minuto usando el
+**tiempo en que ocurrieron los hechos** —no el momento en que llegaron— y el resultado
+se publica en un tópico que un tablero puede consumir.
 
 ```text
   Simulador de jornada          Kafka                  Beam                  Kafka              Vista
@@ -32,6 +40,18 @@ hechos**, no sobre el momento en que llegaron.
   con duplicados,         cc.agent-state       deduplicar · combinar    1m.v1              clave lógica
   desorden y retrasos                          (KafkaIO, DirectRunner)  cc.events.dlq
 ```
+
+### Las partes
+
+| Etapa | Qué aporta |
+|---|---|
+| **Fuente** | un simulador de la jornada que se puede repetir, con duplicados, desorden y retrasos inyectados a propósito |
+| **Kafka** | el log durable que desacopla: el productor no sabe quién lee, y los eventos quedan retenidos para poder reprocesarlos |
+| **Beam** | la semántica: valida el contrato, agrupa por tiempo de evento, deduplica con estado y calcula las métricas |
+| **Salida** | un tópico de cambios con clave estable, que un consumidor materializa por *upsert* |
+
+Los cuatro tópicos, sus claves y su retención están en
+[`docs/documento-tecnico.md`](docs/documento-tecnico.md).
 
 ---
 
