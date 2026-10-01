@@ -1,5 +1,13 @@
 .PHONY: help up down topics producer pipeline metrics dlq offsets demo smoke test lint check clean sync
 
+# El pipeline necesita un límite de lectura o corre para siempre: sin él la fuente
+# queda abierta, el watermark no avanza y nunca publica nada. Se cuentan los
+# registros del tópico de contactos y se pasan como límite exacto, con un consumer
+# group nuevo para que lea desde el principio.
+RECORDS = $$(docker compose exec -T kafka /opt/kafka/bin/kafka-get-offsets.sh \
+	--bootstrap-server localhost:9092 --topic cc.contacts.raw.v1 2>/dev/null \
+	| awk -F: '{s+=$$3} END {print s}')
+
 help:
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
@@ -34,8 +42,11 @@ producer: ## Publica una jornada simulada (duplicados, desorden y eventos invál
 	docker compose run --rm -T producer
 
 pipeline: ## Ejecuta el pipeline Beam contra Kafka (corre en el host, ver README)
+	@echo "== Pipeline sobre $(RECORDS) registros =="
 	KAFKA_BOOTSTRAP_SERVERS=localhost:29092 AWS_REGION=us-east-1 \
-		uv run python -m contact_center.pipeline
+		uv run python -m contact_center.pipeline \
+		--group-id cc-beam-$$(date +%s) \
+		--max-num-records $(RECORDS)
 
 metrics: ## Materializa el changelog y muestra la tabla de métricas
 	KAFKA_BOOTSTRAP_SERVERS=localhost:29092 uv run python -m contact_center.consumer

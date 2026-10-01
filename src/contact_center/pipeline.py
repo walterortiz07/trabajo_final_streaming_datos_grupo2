@@ -69,6 +69,7 @@ def build_pipeline(
     *,
     group_id: str,
     max_num_records: int | None = None,
+    max_read_time: int | None = None,
 ):
     """Construir el grafo. Devuelve `(agregados, inválidos)` sin ejecutarlo."""
     expansion_service = kafka_io_expansion_service()
@@ -76,6 +77,8 @@ def build_pipeline(
     read_kwargs: dict[str, object] = {}
     if max_num_records is not None:
         read_kwargs["max_num_records"] = max_num_records
+    if max_read_time is not None:
+        read_kwargs["max_read_time"] = max_read_time
 
     raw = pipeline | "Leer eventos de Kafka" >> ReadFromKafka(
         consumer_config={
@@ -137,6 +140,7 @@ def run(
     *,
     group_id: str = "cc-beam-metrics-v1",
     max_num_records: int | None = None,
+    max_read_time: int | None = None,
 ):
     settings = Settings.from_env()
     options = pipeline_options(settings, job_name=settings.job_name)
@@ -146,6 +150,7 @@ def run(
         settings,
         group_id=group_id,
         max_num_records=max_num_records,
+        max_read_time=max_read_time,
     )
     result = pipeline.run()
     result.wait_until_finish()
@@ -164,10 +169,20 @@ def main() -> None:
         "--max-num-records",
         type=int,
         default=None,
-        help="corta la lectura tras N registros; útil para la prueba de humo",
+        help="corta la lectura tras N registros",
+    )
+    parser.add_argument(
+        "--max-read-time",
+        type=int,
+        default=None,
+        help="corta la lectura tras N segundos; sirve cuando no se sabe cuántos registros hay",
     )
     args = parser.parse_args()
-    result = run(group_id=args.group_id, max_num_records=args.max_num_records)
+    result = run(
+        group_id=args.group_id,
+        max_num_records=args.max_num_records,
+        max_read_time=args.max_read_time,
+    )
     print(json.dumps({"estado": str(result.state)}))
 
 
